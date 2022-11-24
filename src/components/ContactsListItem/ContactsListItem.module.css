@@ -1,0 +1,21 @@
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+.text {
+  margin-right: 10px;
+  font-size: 14px;
+  margin-right: auto;
+}
+.number {
+  color: teal;
+  font-size: 12px;
+  border: 1px solid teal;
+  padding: 5px 10px;
+  border-radius: 3px;
+}
+.button {
+  margin-left: 20px;
+}

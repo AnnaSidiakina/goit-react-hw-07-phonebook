@@ -1,33 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styles from './AddContactsForm.module.css';
-import { useDispatch, useSelector } from 'react-redux';
-import { nanoid } from 'nanoid';
-import { addContact } from 'redux/operations';
-import { selectContacts } from 'redux/selectors';
+import { useAddContactMutation } from 'redux/services';
+import Loader from 'components/Loader/Loader';
+import { toast } from 'react-toast';
 
-const Form = () => {
-  const dispatch = useDispatch();
-  const contacts = useSelector(selectContacts);
+const Form = ({ contacts }) => {
+  const [addContact, { isLoading }] = useAddContactMutation();
 
   const handleSubmit = e => {
     e.preventDefault();
-    const form = e.target;
-    const userName = contacts.find(
-      contact =>
-        contact.name.toLowerCase() === form.elements.name.value.toLowerCase()
-    );
-    if (userName) {
-      alert(`${userName.name} is already in contacts`);
-    } else {
-      dispatch(
-        addContact({
-          id: nanoid(),
-          name: form.elements.name.value,
-          number: form.elements.number.value,
-        })
-      );
+    const form = e.currentTarget;
+    const formName = e.currentTarget.elements.name.value;
+    const formPhone = e.currentTarget.elements.number.value;
+    const contactsName = contacts.map(contact => contact.name.toLowerCase());
+
+    if (contactsName.includes(formName.toLowerCase())) {
+      form.reset();
+      return toast.error(`${formName} is already in your list`);
     }
+    addContact({
+      name: formName,
+      phone: formPhone,
+    });
+    toast.success('The contact has been added to your list');
 
     form.reset();
   };
@@ -57,7 +53,9 @@ const Form = () => {
             required
           />
         </label>
-        <button type="submit">Add contact</button>
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? <Loader size={'10'} /> : 'Add contact'}
+        </button>
       </form>
     </div>
   );
@@ -65,5 +63,14 @@ const Form = () => {
 export default Form;
 
 Form.propTypes = {
-  handleSubmit: PropTypes.func.isRequired,
+  contacts: PropTypes.oneOfType([
+    PropTypes.arrayOf(
+      PropTypes.exact({
+        id: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        number: PropTypes.string.isRequired,
+      })
+    ),
+    PropTypes.array,
+  ]),
 };

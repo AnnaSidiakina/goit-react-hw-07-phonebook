@@ -1,12 +1,8 @@
 import React from 'react';
 import styles from './Filter.module.css';
-import { selectFilter } from 'redux/selectors';
-import { useDispatch, useSelector } from 'react-redux';
-import { setFilterValue } from 'redux/filterSlice';
+import PropTypes from 'prop-types';
 
-const Filter = () => {
-  const dispatch = useDispatch();
-  const filter = useSelector(selectFilter);
+const Filter = ({ filter, onChange }) => {
   return (
     <div className={styles.form}>
       <label className={styles.label}>
@@ -15,7 +11,7 @@ const Filter = () => {
           value={filter}
           className={styles.input}
           type="text"
-          onChange={e => dispatch(setFilterValue(e.currentTarget.value))}
+          onChange={e => onChange(e.currentTarget.value)}
         />
       </label>
     </div>
@@ -23,3 +19,8 @@ const Filter = () => {
 };
 
 export default Filter;
+
+Filter.propTypes = {
+  filter: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
