@@ -1,8 +1,37 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styles from './AddContactsForm.module.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { nanoid } from 'nanoid';
+import { addContact } from 'redux/operations';
+import { selectContacts } from 'redux/selectors';
 
-const Form = ({ handleSubmit }) => {
+const Form = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
+
+  const handleSubmit = e => {
+    e.preventDefault();
+    const form = e.target;
+    const userName = contacts.find(
+      contact =>
+        contact.name.toLowerCase() === form.elements.name.value.toLowerCase()
+    );
+    if (userName) {
+      alert(`${userName.name} is already in contacts`);
+    } else {
+      dispatch(
+        addContact({
+          id: nanoid(),
+          name: form.elements.name.value,
+          number: form.elements.number.value,
+        })
+      );
+    }
+
+    form.reset();
+  };
+
   return (
     <div className={styles.container}>
       <form className={styles.form} onSubmit={handleSubmit}>
