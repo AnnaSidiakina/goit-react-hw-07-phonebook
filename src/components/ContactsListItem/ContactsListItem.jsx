@@ -3,13 +3,23 @@ import PropTypes from 'prop-types';
 import Loader from 'components/Loader/Loader';
 import styles from './ContactsListItem.module.css';
 import { toast } from 'react-toast';
+import { useEffect } from 'react';
 
 export const ContactsListItem = ({ id, name, phone }) => {
-  const [deleteContact, { isLoading: isDeleting }] = useDeleteContactMutation();
+  const [deleteContact, { isLoading: isDeleting, isSuccess }] =
+    useDeleteContactMutation();
+
+  // use useEffect so that the success notification shows up only when the contact is deleted
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success('The contact has been successfully deleted');
+    }
+  }, [isSuccess]);
+
   const handleClick = () => {
     deleteContact(id);
-    toast.success('The contact has been successfully deleted');
   };
+
   return (
     <li className={styles.item}>
       <span className={styles.text}>{name}</span>

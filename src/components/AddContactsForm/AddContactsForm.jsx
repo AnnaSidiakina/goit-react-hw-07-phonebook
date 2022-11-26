@@ -4,29 +4,51 @@ import styles from './AddContactsForm.module.css';
 import { useAddContactMutation } from 'redux/services';
 import Loader from 'components/Loader/Loader';
 import { toast } from 'react-toast';
+import { useEffect, useState } from 'react';
 
 const Form = ({ contacts }) => {
-  const [addContact, { isLoading }] = useAddContactMutation();
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
+  const [addContact, { isLoading, isSuccess }] = useAddContactMutation();
+
+  const handleNameChange = event => {
+    setName(event.currentTarget.value);
+  };
+  const handleNumberChange = event => {
+    setNumber(event.currentTarget.value);
+  };
+
+  const reset = () => {
+    setName('');
+    setNumber('');
+  };
 
   const handleSubmit = e => {
     e.preventDefault();
-    const form = e.currentTarget;
+    // const form = e.currentTarget;
     const formName = e.currentTarget.elements.name.value;
     const formPhone = e.currentTarget.elements.number.value;
     const contactsName = contacts.map(contact => contact.name.toLowerCase());
 
     if (contactsName.includes(formName.toLowerCase())) {
-      form.reset();
+      // form.reset();
       return toast.error(`${formName} is already in your list`);
     }
     addContact({
       name: formName,
       phone: formPhone,
     });
-    toast.success('The contact has been added to your list');
 
-    form.reset();
+    // form.reset();
   };
+
+  // use useEffect so that the success notification shows up only when the contact is added
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success('The contact has been added to your list');
+      reset();
+    }
+  }, [isSuccess]);
 
   return (
     <div className={styles.container}>
@@ -37,6 +59,8 @@ const Form = ({ contacts }) => {
             className={styles.input}
             type="text"
             name="name"
+            value={name}
+            onChange={handleNameChange}
             pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
             title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
             required
@@ -48,6 +72,8 @@ const Form = ({ contacts }) => {
             className={styles.input}
             type="tel"
             name="number"
+            value={number}
+            onChange={handleNumberChange}
             pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
             title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
             required
